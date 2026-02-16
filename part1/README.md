@@ -1,15 +1,34 @@
 # HBnB Evolution - Technical Documentation (Part 1)
 
 ## Introduction
-Ce document fournit la documentation technique complète pour le projet **HBnB Evolution**, une version simplifiée d'AirBnB.  
-Il décrit l’architecture de l’application, la logique métier, les entités principales et le flux des API.  
-Cette documentation servira de référence pour le développement et l’implémentation future de l’application.
+
+This document provides the complete technical documentation for the **HBnB Evolution** project, a simplified AirBnB-like application.
+
+The purpose of this document is to define:
+- The overall system architecture
+- The Business Logic design
+- The relationships between entities
+- The API interaction flow
+
+This documentation serves as a blueprint for the implementation phase.
 
 ---
 
-## 1. High-Level Architecture
+# 1. High-Level Architecture
 
-### High-Level Package Diagram
+## 1.1 Overview
+
+The application follows a **layered architecture** composed of three layers:
+
+1. Presentation Layer
+2. Business Logic Layer
+3. Persistence Layer
+
+The layers communicate using the **Facade pattern** to reduce coupling and improve maintainability.
+
+---
+
+## 1.2 High-Level Package Diagram
 
 ```mermaid
 classDiagram
@@ -36,19 +55,48 @@ classDiagram
 
     PresentationLayer --> BusinessLogicLayer : calls Facade
     BusinessLogicLayer --> PersistenceLayer : uses Repositories
-Layer Responsibilities
-Presentation Layer : gère les interactions utilisateur (API / Services)
+Explanation
 
-Business Logic Layer : contient les entités et la logique métier, exposée via le Facade
+The Presentation Layer handles client requests.
 
-Persistence Layer : gère le stockage et récupération des données via les Repositories
+The Business Logic Layer contains the core models and rules.
 
-Note sur le Facade Pattern :
-Le Facade centralise tous les appels du Presentation Layer vers le Business Logic Layer, simplifiant l’accès aux opérations et garantissant la cohérence des règles métier.
+The Persistence Layer manages data storage.
+
+The Facade centralizes communication between Presentation and Business layers.
+
+This structure ensures:
+
+Low coupling
+
+Clear separation of concerns
+
+Better scalability
 
 2. Business Logic Layer
-Detailed Class Diagram
+2.1 Overview
+
+The Business Logic Layer contains the core entities:
+
+User
+
+Place
+
+Review
+
+Amenity
+
+Each entity:
+
+Has a UUID identifier
+
+Stores created_at and updated_at
+
+Implements CRUD operations
+
+2.2 Detailed Class Diagram
 classDiagram
+
     class User {
         +UUID id
         +string first_name
@@ -75,13 +123,11 @@ classDiagram
         +create_place()
         +update_place()
         +delete_place()
-        +list_place()
+        +list_places()
     }
 
     class Review {
         +UUID id
-        +UUID user_id
-        +UUID place_id
         +int rating
         +string comment
         +datetime created_at
@@ -104,52 +150,58 @@ classDiagram
         +list_amenities()
     }
 
-    User "1" -- "0..*" Place : owns >
-    Place "1" -- "0..*" Review : has >
-    User "1" -- "0..*" Review : writes >
-    Place "1" -- "0..*" Amenity : includes >
-    Amenity "0..*" -- "0..*" Place : available_at >
-Entity Descriptions
-User : utilisateur de l’application (normal ou admin) ; peut créer des places et des reviews
+    User "1" -- "0..*" Place : owns
+    User "1" -- "0..*" Review : writes
+    Place "1" -- "0..*" Review : receives
+    Place "0..*" -- "0..*" Amenity : includes
+2.3 Relationship Explanation
 
-Place : propriété listée par un utilisateur ; possède des reviews et amenities
+One User can own multiple Places.
 
-Review : avis d’un utilisateur sur une place
+One User can write multiple Reviews.
 
-Amenity : équipements/services disponibles pour une ou plusieurs places
+One Place can have multiple Reviews.
 
-3. API Interaction Flow
+Places and Amenities have a many-to-many relationship.
+
+This model ensures logical consistency and respects business rules.
+
+3. Sequence Diagrams (API Calls)
 3.1 User Registration
 sequenceDiagram
-    participant Client as "Client"
-    participant API as "API"
-    participant Facade as "Facade"
-    participant User as "User"
-    participant Repo as "Repository"
+    participant Client
+    participant API
+    participant Facade
+    participant User
+    participant Repository
 
-    Client->>API: POST /users (user info)
+    Client->>API: POST /users
     API->>Facade: register_user(data)
     Facade->>User: create instance
-    User->>Repo: save()
-    Repo-->>User: confirm save
-    User-->>Facade: return user object
-    Facade-->>API: return success
+    User->>Repository: save()
+    Repository-->>User: confirmation
+    User-->>Facade: return user
+    Facade-->>API: success response
     API-->>Client: 201 Created
+Explanation
+
+The API receives user data, passes it to the Facade, which creates a User instance and saves it through the Repository.
+
 3.2 Place Creation
 sequenceDiagram
     participant Client
     participant API
     participant Facade
     participant Place
-    participant Repo
+    participant Repository
 
-    Client->>API: POST /places (place info)
-    API->>Facade: create_place(data, owner_id)
+    Client->>API: POST /places
+    API->>Facade: create_place(data)
     Facade->>Place: create instance
-    Place->>Repo: save()
-    Repo-->>Place: confirm save
-    Place-->>Facade: return place object
-    Facade-->>API: return success
+    Place->>Repository: save()
+    Repository-->>Place: confirmation
+    Place-->>Facade: return place
+    Facade-->>API: success response
     API-->>Client: 201 Created
 3.3 Review Submission
 sequenceDiagram
@@ -157,27 +209,37 @@ sequenceDiagram
     participant API
     participant Facade
     participant Review
-    participant Repo
+    participant Repository
 
-    Client->>API: POST /reviews (place_id, rating, comment)
-    API->>Facade: add_review(user_id, place_id, data)
+    Client->>API: POST /reviews
+    API->>Facade: create_review(data)
     Facade->>Review: create instance
-    Review->>Repo: save()
-    Repo-->>Review: confirm save
-    Review-->>Facade: return review object
-    Facade-->>API: return success
+    Review->>Repository: save()
+    Repository-->>Review: confirmation
+    Review-->>Facade: return review
+    Facade-->>API: success response
     API-->>Client: 201 Created
 3.4 Fetch List of Places
 sequenceDiagram
     participant Client
     participant API
     participant Facade
-    participant Repo
-    participant Place
+    participant Repository
 
     Client->>API: GET /places
     API->>Facade: list_places()
-    Facade->>Repo: fetch all places
-    Repo-->>Facade: return list
-    Facade-->>API: return list of places
+    Facade->>Repository: fetch all places
+    Repository-->>Facade: return list
+    Facade-->>API: return list
     API-->>Client: 200 OK
+4. Design Decisions
+
+The Facade pattern reduces coupling between layers.
+
+Each layer has a clear responsibility.
+
+UUID ensures unique identification.
+
+Timestamps support audit tracking.
+
+Many-to-many relationship between Place and Amenity allows flexibility.
