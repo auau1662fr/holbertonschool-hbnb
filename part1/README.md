@@ -20,9 +20,9 @@ This documentation serves as a blueprint for the implementation phase.
 
 The application follows a **layered architecture** composed of three layers:
 
-1. Presentation Layer
-2. Business Logic Layer
-3. Persistence Layer
+1. **Presentation Layer** – handles client requests via API and Services.  
+2. **Business Logic Layer** – contains core models (User, Place, Review, Amenity) and the Facade.  
+3. **Persistence Layer** – manages data storage through Repositories and Database.  
 
 The layers communicate using the **Facade pattern** to reduce coupling and improve maintainability.
 
@@ -55,28 +55,21 @@ classDiagram
 
     PresentationLayer --> BusinessLogicLayer : calls Facade
     BusinessLogicLayer --> PersistenceLayer : uses Repositories
-Explanation
 
-The Presentation Layer handles client requests.
+Explanation:
 
-The Business Logic Layer contains the core models and rules.
+The Presentation Layer only handles client interactions.
 
-The Persistence Layer manages data storage.
+The Business Logic Layer contains all core entities and rules.
 
-The Facade centralizes communication between Presentation and Business layers.
+The Persistence Layer handles database operations.
 
-This structure ensures:
-
-Low coupling
-
-Clear separation of concerns
-
-Better scalability
+The Facade simplifies interaction between Presentation and Business layers, reducing coupling.
 
 2. Business Logic Layer
 2.1 Overview
 
-The Business Logic Layer contains the core entities:
+This layer contains the main entities:
 
 User
 
@@ -86,17 +79,16 @@ Review
 
 Amenity
 
-Each entity:
+Each entity has:
 
-Has a UUID identifier
+UUID identifier
 
-Stores created_at and updated_at
+created_at and updated_at timestamps
 
-Implements CRUD operations
+CRUD operations
 
 2.2 Detailed Class Diagram
 classDiagram
-
     class User {
         +UUID id
         +string first_name
@@ -154,17 +146,16 @@ classDiagram
     User "1" -- "0..*" Review : writes
     Place "1" -- "0..*" Review : receives
     Place "0..*" -- "0..*" Amenity : includes
-2.3 Relationship Explanation
 
-One User can own multiple Places.
+Explanation:
 
-One User can write multiple Reviews.
+One User can own multiple Places and write multiple Reviews.
 
-One Place can have multiple Reviews.
+One Place can receive multiple Reviews.
 
 Places and Amenities have a many-to-many relationship.
 
-This model ensures logical consistency and respects business rules.
+This diagram reflects all business rules and entity responsibilities.
 
 3. Sequence Diagrams (API Calls)
 3.1 User Registration
@@ -183,9 +174,9 @@ sequenceDiagram
     User-->>Facade: return user
     Facade-->>API: success response
     API-->>Client: 201 Created
-Explanation
 
-The API receives user data, passes it to the Facade, which creates a User instance and saves it through the Repository.
+Explanation:
+The client sends user data to the API. The API delegates to the Facade, which creates a User instance and saves it in the Repository. The response is returned to the client.
 
 3.2 Place Creation
 sequenceDiagram
@@ -203,6 +194,10 @@ sequenceDiagram
     Place-->>Facade: return place
     Facade-->>API: success response
     API-->>Client: 201 Created
+
+Explanation:
+The client sends place data, which is handled by the Facade to create and persist a Place entity.
+
 3.3 Review Submission
 sequenceDiagram
     participant Client
@@ -219,6 +214,10 @@ sequenceDiagram
     Review-->>Facade: return review
     Facade-->>API: success response
     API-->>Client: 201 Created
+
+Explanation:
+The client submits a review. The Facade handles creation and persistence, returning the result to the client.
+
 3.4 Fetch List of Places
 sequenceDiagram
     participant Client
@@ -232,14 +231,20 @@ sequenceDiagram
     Repository-->>Facade: return list
     Facade-->>API: return list
     API-->>Client: 200 OK
+
+Explanation:
+The client requests all places. The API delegates to the Facade, which fetches data from the Repository and returns the list.
+
 4. Design Decisions
 
-The Facade pattern reduces coupling between layers.
+Facade pattern reduces coupling between layers.
 
 Each layer has a clear responsibility.
 
-UUID ensures unique identification.
+UUIDs ensure unique identification.
 
-Timestamps support audit tracking.
+Timestamps support auditing.
 
 Many-to-many relationship between Place and Amenity allows flexibility.
+
+This structure ensures maintainable and scalable code.
