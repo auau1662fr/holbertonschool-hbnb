@@ -88,65 +88,9 @@ created_at and updated_at timestamps
 CRUD operations
 
 2.2 Detailed Class Diagram
-classDiagram
-    class User {
-        +UUID id
-        +string first_name
-        +string last_name
-        +string email
-        +string password
-        +bool is_admin
-        +datetime created_at
-        +datetime updated_at
-        +register()
-        +update_profile()
-        +delete_user()
-    }
+## Graphic Class Diagram
 
-    class Place {
-        +UUID id
-        +string title
-        +string description
-        +float price
-        +float latitude
-        +float longitude
-        +datetime created_at
-        +datetime updated_at
-        +create_place()
-        +update_place()
-        +delete_place()
-        +list_places()
-    }
-
-    class Review {
-        +UUID id
-        +int rating
-        +string comment
-        +datetime created_at
-        +datetime updated_at
-        +create_review()
-        +update_review()
-        +delete_review()
-        +list_reviews()
-    }
-
-    class Amenity {
-        +UUID id
-        +string name
-        +string description
-        +datetime created_at
-        +datetime updated_at
-        +create_amenity()
-        +update_amenity()
-        +delete_amenity()
-        +list_amenities()
-    }
-
-    User "1" -- "0..*" Place : owns
-    User "1" -- "0..*" Review : writes
-    Place "1" -- "0..*" Review : receives
-    Place "0..*" -- "0..*" Amenity : includes
-
+![HBnB Class Diagram](images/class_diagram.png)
 Explanation:
 
 One User can own multiple Places and write multiple Reviews.
