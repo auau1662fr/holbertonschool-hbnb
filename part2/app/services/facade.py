@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-HBnB Facade
+HBnB Facade - Part 2 compliant
+Only Review supports DELETE
 """
 
 from app.persistence.repository import InMemoryRepository
@@ -20,6 +21,18 @@ class HBnBFacade:
     # ================= USER =================
 
     def create_user(self, data):
+        required_fields = ["first_name", "last_name", "email", "password"]
+
+        missing_fields = [
+            field for field in required_fields
+            if field not in data or not data[field]
+        ]
+
+        if missing_fields:
+            raise ValueError(
+                f"Missing required fields: {', '.join(missing_fields)}"
+            )
+
         user = User(**data)
         self.user_repo.add(user)
         return user
@@ -33,8 +46,6 @@ class HBnBFacade:
     def update_user(self, user_id, data):
         return self.user_repo.update(user_id, data)
 
-    def delete_user(self, user_id):
-        return self.user_repo.delete(user_id)
 
     # ================= PLACE =================
 
@@ -52,8 +63,6 @@ class HBnBFacade:
     def update_place(self, place_id, data):
         return self.place_repo.update(place_id, data)
 
-    def delete_place(self, place_id):
-        return self.place_repo.delete(place_id)
 
     # ================= REVIEW =================
 
@@ -74,6 +83,7 @@ class HBnBFacade:
     def delete_review(self, review_id):
         return self.review_repo.delete(review_id)
 
+
     # ================= AMENITY =================
 
     def create_amenity(self, data):
@@ -90,9 +100,5 @@ class HBnBFacade:
     def update_amenity(self, amenity_id, data):
         return self.amenity_repo.update(amenity_id, data)
 
-    def delete_amenity(self, amenity_id):
-        return self.amenity_repo.delete(amenity_id)
-
 
 facade = HBnBFacade()
-

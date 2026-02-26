@@ -36,11 +36,3 @@ def update_place(place_id):
     if not place:
         return jsonify({"error": "Place not found"}), 404
     return jsonify(place.to_dict())
-
-
-@api_v1.route('/places/<place_id>', methods=['DELETE'])
-def delete_place(place_id):
-    place = facade.delete_place(place_id)
-    if not place:
-        return jsonify({"error": "Place not found"}), 404
-    return jsonify({"message": "Place deleted"})

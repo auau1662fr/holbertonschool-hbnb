@@ -36,11 +36,3 @@ def update_amenity(amenity_id):
     if amenity:
         return jsonify(amenity.to_dict()), 200
     return jsonify({"error": "Amenity not found"}), 404
-
-
-@api_v1.route('/amenities/<amenity_id>', methods=['DELETE'])
-def delete_amenity(amenity_id):
-    result = facade.delete_amenity(amenity_id)
-    if result:
-        return jsonify({"message": "Amenity deleted"}), 200
-    return jsonify({"error": "Amenity not found"}), 404

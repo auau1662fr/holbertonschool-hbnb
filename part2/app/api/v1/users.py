@@ -11,8 +11,11 @@ from app.services.facade import facade
 @api_v1.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
-    user = facade.create_user(data)
-    return jsonify(user.to_dict()), 201
+    try:
+        user = facade.create_user(data)
+        return jsonify(user.to_dict()), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @api_v1.route('/users', methods=['GET'])
@@ -36,11 +39,3 @@ def update_user(user_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
     return jsonify(user.to_dict())
-
-
-@api_v1.route('/users/<user_id>', methods=['DELETE'])
-def delete_user(user_id):
-    user = facade.delete_user(user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-    return jsonify({"message": "User deleted"})
