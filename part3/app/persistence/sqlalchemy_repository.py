@@ -1,28 +1,26 @@
 from app import db
-
-
 class SQLAlchemyRepository:
-    """Generic repository using SQLAlchemy"""
+    """Repository using SQLAlchemy for CRUD operations"""
 
     def add(self, obj):
-        """Add object to database"""
+        """Add an object to the database"""
         db.session.add(obj)
         db.session.commit()
         return obj
 
     def get(self, model, obj_id):
-        """Get object by id"""
-        return model.query.get(obj_id)
+        """Get an object by ID"""
+        return db.session.get(model, obj_id)
 
     def get_all(self, model):
         """Get all objects of a model"""
-        return model.query.all()
+        return db.session.query(model).all()
 
     def update(self):
-        """Commit updates"""
+        """Commit changes"""
         db.session.commit()
 
     def delete(self, obj):
-        """Delete object"""
+        """Delete an object"""
         db.session.delete(obj)
         db.session.commit()

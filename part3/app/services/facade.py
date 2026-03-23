@@ -1,10 +1,4 @@
-#!/usr/bin/python3
-"""
-HBnB Facade - Part 2 compliant
-Only Review supports DELETE
-"""
-
-from app.persistence.repository import InMemoryRepository
+from app.persistence.sqlalchemy_repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
@@ -13,92 +7,117 @@ from app.models.amenity import Amenity
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository()
+        self.place_repo = SQLAlchemyRepository()
+        self.review_repo = SQLAlchemyRepository()
+        self.amenity_repo = SQLAlchemyRepository()
 
     # ================= USER =================
 
     def create_user(self, data):
         required_fields = ["first_name", "last_name", "email", "password"]
 
-        missing_fields = [
-            field for field in required_fields
-            if field not in data or not data[field]
-        ]
-
-        if missing_fields:
-            raise ValueError(
-                f"Missing required fields: {', '.join(missing_fields)}"
-            )
+        missing = [f for f in required_fields if f not in data or not data[f]]
+        if missing:
+            raise ValueError(f"Missing required fields: {', '.join(missing)}")
 
         user = User(**data)
-        self.user_repo.add(user)
-        return user
+        return self.user_repo.add(user)
 
     def get_users(self):
-        return self.user_repo.get_all()
+        return self.user_repo.get_all(User)
 
     def get_user(self, user_id):
-        return self.user_repo.get(user_id)
+        return self.user_repo.get(User, user_id)
 
     def update_user(self, user_id, data):
-        return self.user_repo.update(user_id, data)
+        user = self.get_user(user_id)
+        if not user:
+            return None
 
+        for key, value in data.items():
+            setattr(user, key, value)
+
+        self.user_repo.update()
+        return user
 
     # ================= PLACE =================
 
     def create_place(self, data):
         place = Place(**data)
-        self.place_repo.add(place)
-        return place
+        return self.place_repo.add(place)
 
     def get_places(self):
-        return self.place_repo.get_all()
+        return self.place_repo.get_all(Place)
 
     def get_place(self, place_id):
-        return self.place_repo.get(place_id)
+        return self.place_repo.get(Place, place_id)
 
     def update_place(self, place_id, data):
-        return self.place_repo.update(place_id, data)
+        place = self.get_place(place_id)
+        if not place:
+            return None
 
+        for key, value in data.items():
+            setattr(place, key, value)
+
+        self.place_repo.update()
+        return place
 
     # ================= REVIEW =================
 
     def create_review(self, data):
         review = Review(**data)
-        self.review_repo.add(review)
-        return review
+        return self.review_repo.add(review)
 
     def get_reviews(self):
-        return self.review_repo.get_all()
+        return self.review_repo.get_all(Review)
 
     def get_review(self, review_id):
-        return self.review_repo.get(review_id)
+        return self.review_repo.get(Review, review_id)
 
     def update_review(self, review_id, data):
-        return self.review_repo.update(review_id, data)
+        review = self.get_review(review_id)
+        if not review:
+            return None
+
+        for key, value in data.items():
+            setattr(review, key, value)
+
+        self.review_repo.update()
+        return review
 
     def delete_review(self, review_id):
-        return self.review_repo.delete(review_id)
+        review = self.get_review(review_id)
+        if not review:
+            return None
 
+        self.review_repo.delete(review)
+        return True
 
     # ================= AMENITY =================
 
     def create_amenity(self, data):
         amenity = Amenity(**data)
-        self.amenity_repo.add(amenity)
-        return amenity
+        return self.amenity_repo.add(amenity)
 
     def get_amenities(self):
-        return self.amenity_repo.get_all()
+        return self.amenity_repo.get_all(Amenity)
 
     def get_amenity(self, amenity_id):
-        return self.amenity_repo.get(amenity_id)
+        return self.amenity_repo.get(Amenity, amenity_id)
 
     def update_amenity(self, amenity_id, data):
-        return self.amenity_repo.update(amenity_id, data)
+        amenity = self.get_amenity(amenity_id)
+        if not amenity:
+            return None
+
+        for key, value in data.items():
+            setattr(amenity, key, value)
+
+        self.amenity_repo.update()
+        return amenity
 
 
+# instance globale
 facade = HBnBFacade()
