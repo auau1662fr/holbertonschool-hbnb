@@ -1,5 +1,3 @@
-import os
-
 class Config:
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://root:password@localhost/hbnb"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///hbnb.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
