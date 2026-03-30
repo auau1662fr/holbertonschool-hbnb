@@ -1,8 +1,3 @@
-
-auau 1662 fr <auric.chen.2005@gmail.com>
-10:18 (il y a 0 minute)
-À moi
-
 import uuid
 from datetime import datetime
 from app import db
