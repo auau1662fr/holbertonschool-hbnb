@@ -1,4 +1,4 @@
-#!/home/sens003/root/holbertonschool-hbnb/part3/venv/bin/python3
+#!/home/auric/root/holbertonschool-hbnb/part3/venv/bin/python3
 import sys
 from flask.cli import main
 if __name__ == '__main__':
