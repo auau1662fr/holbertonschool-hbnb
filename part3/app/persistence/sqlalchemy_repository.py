@@ -1,26 +1,35 @@
-from app import db
-class SQLAlchemyRepository:
-    """Repository using SQLAlchemy for CRUD operations"""
+from app.extensions import db
 
+
+class SQLAlchemyRepository:
+    def __init__(self, model):
+        self.model = model
+
+    # ---------------- CREATE ----------------
     def add(self, obj):
-        """Add an object to the database"""
         db.session.add(obj)
         db.session.commit()
         return obj
 
-    def get(self, model, obj_id):
-        """Get an object by ID"""
-        return db.session.get(model, obj_id)
+    # ---------------- READ ----------------
+    def get(self, obj_id):
+        return self.model.query.get(obj_id)
 
-    def get_all(self, model):
-        """Get all objects of a model"""
-        return db.session.query(model).all()
+    def get_all(self):
+        return self.model.query.all()
 
-    def update(self):
-        """Commit changes"""
+    def get_by_attribute(self, attr, value):
+        return self.model.query.filter(
+            getattr(self.model, attr) == value
+        ).first()
+
+    # ---------------- UPDATE ----------------
+    def update(self, obj):
         db.session.commit()
+        return obj
 
+    # ---------------- DELETE ----------------
     def delete(self, obj):
-        """Delete an object"""
         db.session.delete(obj)
         db.session.commit()
+        return True
