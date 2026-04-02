@@ -2,27 +2,263 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
+            --border: #2e2e2e;
+            --accent: #e8c97e;
+            --accent-dim: rgba(232, 201, 126, 0.15);
+            --text: #f0ece4;
+            --muted: #777;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 48px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+        }
+
+        .logo-text span {
+            color: var(--text);
+            opacity: 0.4;
+            font-weight: 400;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Decorative circle */
+        main::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 201, 126, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px;
+            position: relative;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .card-sub {
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-bottom: 36px;
+            font-weight: 300;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 13px 16px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+
+        input::placeholder { color: #444; }
+
+        .btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            background: var(--accent);
+            color: #0f0f0f;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 0.04em;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+
+        .error-msg {
+            display: none;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(255, 80, 80, 0.1);
+            border: 1px solid rgba(255, 80, 80, 0.3);
+            border-radius: 8px;
+            color: #ff6b6b;
+            font-size: 0.88rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+    </style>
 </head>
 <body>
 
 <header>
-    <img src="logo.png" class="logo">
+    <div class="logo-text">HB<span>n</span>B</div>
+    <a href="index.html" style="color: var(--muted); font-size: 0.88rem; text-decoration: none;">← Back to places</a>
 </header>
 
-<h2>Login</h2>
+<main>
+    <div class="login-card">
+        <h1 class="card-title">Welcome back</h1>
+        <p class="card-sub">Sign in to your account to continue</p>
 
-<form id="login-form">
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
+        <form id="login-form">
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn">Sign in</button>
+            <div class="error-msg" id="error-msg">Invalid email or password.</div>
+        </form>
+    </div>
+</main>
 
 <footer>
-    <p>All rights reserved</p>
+    <p>© 2025 HBnB — All rights reserved</p>
 </footer>
 
 <script src="scripts.js"></script>
+<script>
+    // Override error display
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('error-msg');
+        errorMsg.style.display = 'none';
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/v1/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.cookie = `token=${data.access_token}; path=/`;
+                const redirect = new URLSearchParams(window.location.search).get('redirect');
+                window.location.href = redirect || 'index.html';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        } catch (err) {
+            errorMsg.style.display = 'block';
+            console.error(err);
+        }
+    });
+</script>
 </body>
 </html>
